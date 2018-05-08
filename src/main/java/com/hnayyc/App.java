@@ -1,11 +1,15 @@
 package com.hnayyc;
 
+import com.hnayyc.giftcrawler.pipeline.DbPipeline;
+import com.hnayyc.giftcrawler.pipeline.SysoutPipeline;
 import com.hnayyc.giftcrawler.webmagic.DoubanBookPageProcessor;
 import com.hnayyc.giftcrawler.webmagic.GithubRepoPageProcessor;
+import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.downloader.HttpClientGenerator;
 
 import javax.net.ssl.SSLContext;
+import javax.xml.transform.Result;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -38,13 +42,21 @@ public class App {
          */
 //        Spider.create(new GithubRepoPageProcessor()).addUrl("https://github.com/code4craft").thread(5).run();
 
-        // 数学之美
-//        Spider.create(new DoubanBookPageProcessor()).addUrl("https://book.douban.com/subject/10750155").thread(5).run();
-        // 阿拉伯的劳伦斯
-        Spider.create(new DoubanBookPageProcessor()).addUrl("https://book.douban.com/subject/25883305").thread(5).run();
         // 暂无评分
 //        Spider.create(new DoubanBookPageProcessor()).addUrl("https://book.douban.com/subject/30177173/").thread(5).run();
         // 评价人数不足
 //        Spider.create(new DoubanBookPageProcessor()).addUrl("https://book.douban.com/subject/27661640/").thread(5).run();
+        // 数学之美
+//        Spider.create(new DoubanBookPageProcessor()).addUrl("https://book.douban.com/subject/10750155").thread(5).run();
+        // 阿拉伯的劳伦斯
+//        Spider.create(new DoubanBookPageProcessor()).addUrl("https://book.douban.com/subject/25883305").thread(5).run();
+
+        Spider.create(new DoubanBookPageProcessor()).addPipeline(new DbPipeline()).addUrl("https://book.douban.com/subject/25883305").thread(5).run();
+
+//        ResultItems resultItems = new ResultItems();
+//        resultItems.put("code", "41001");
+//        resultItems.put("name", "郑州");
+//        DbPipeline dbPipeline = new DbPipeline();
+//        dbPipeline.process(resultItems, null);
     }
 }
