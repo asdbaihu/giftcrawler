@@ -1,22 +1,24 @@
 package com.hnayyc.giftcrawler.webmagic;
 
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import us.codecraft.webmagic.Page;
-import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.selector.Html;
 import us.codecraft.webmagic.selector.Selectable;
 
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 
 /**
  * 豆瓣图书
  *
  * 抓取数据的时候当抓取的数据量太大的时候，豆瓣的服务器会检测到，并把ip封掉，
- * 但是用浏览器缺仍然可以访问，所以猜测是服务器对HTTP请求中的cookies进行了检测，
- * 在代码中加上cookies，ip就不会再被封了，另外至于会不会是请求时间间隔太短被封ip，
+ * 但是用浏览器缺仍然可以访问，所以猜测是服务器对HTTP请求中的Cookies进行了检测，
+ * 在代码中加上Cookies，IP就不会再被封了，另外至于会不会是请求时间间隔太短被封IP，
  * 没有具体验证，保险起见每个请求结束之后休眠1s。
  */
 public class DoubanBookPageProcessor implements PageProcessor {
@@ -46,18 +48,19 @@ public class DoubanBookPageProcessor implements PageProcessor {
                 subLine = line.substring(line.indexOf("<a") + 2);
                 key = line.substring(line.indexOf("<span class=\"pl\">")+"<span class=\"pl\">".length(), line.indexOf("</span>"));
                 value = subLine.substring(subLine.indexOf(">")+1, subLine.indexOf("</a>"));
-                parseBookInf(page, key, value);
-                if(subLine.indexOf("丛书") >= 0) {
+                parseBookInfo(page, key, value);
+                if(subLine.indexOf("丛书") >= 0) { // 如果有所属丛书，抓取丛书信息。
                     String tmp = subLine.substring(subLine.indexOf("href=\"")+6);
                     // key = "丛书URL：";
                     value = tmp.substring(0, tmp.indexOf("\""));
                     page.putField("seriesUrl", value);
+                    page.putField("seriesId", value.substring(value.indexOf("series/") + 7));
                 }
             }
             else { // 处理单纯文字的图书信息
                 key = line.substring(line.indexOf("<span class=\"pl\">")+"<span class=\"pl\">".length(), line.indexOf("</span>"));
                 value = line.substring(line.indexOf("</span>") + 7);
-                parseBookInf(page, key, value);
+                parseBookInfo(page, key, value);
             }
         }
 
@@ -66,7 +69,7 @@ public class DoubanBookPageProcessor implements PageProcessor {
         Selectable votesDom = html.xpath("//div[@class='rating_wrap clearbox']//span[@property='v:votes']/text()");
         String score = scoreDom == null ? "" : scoreDom.toString().trim();
         String votes = votesDom == null ? "" : votesDom.toString();
-        if(votes != null) {  // 豆瓣图书评分有三种情况：暂无评分，评价人数不足，正常评分
+        if(votes != null) {  // 豆瓣图书有评分情况：正常评分
             page.putField("score", score);
             page.putField("votes", votes);
             int i = 5;
@@ -74,10 +77,10 @@ public class DoubanBookPageProcessor implements PageProcessor {
             for(Selectable s : lst) {
                 String starScore = s.xpath("//span/text()").toString().trim();
                 page.putField("star"+i, starScore);
-                i++;
+                i--;
             }
         }
-        else {
+        else { // 豆瓣图书无评分情况：暂无评分，评价人数不足
             page.putField("score", "0");
             page.putField("votes", "0");
             page.putField("star5", "0");
@@ -96,14 +99,13 @@ public class DoubanBookPageProcessor implements PageProcessor {
         }
         page.putField("tags", tags);
 
-
-/*
         // 抓取图书封面图片
         String imgUrlStr = html.xpath("//div[@id='mainpic']//img//@src").toString();
         String[] tempArry = imgUrlStr.split("/");
         String imgName = tempArry[tempArry.length - 1];
         String postfix = imgName.substring(imgName.indexOf(".")); // .jpg or .png
         String imgPath = imgDir + "\\" + subject + postfix;
+        page.putField("imagePath", imgPath);
         System.out.println(imgUrlStr);
         System.out.println(imgPath);
         try {
@@ -127,7 +129,6 @@ public class DoubanBookPageProcessor implements PageProcessor {
         } catch (IOException e) {
             e.printStackTrace();
         }
-*/
     }
 
     @Override
@@ -135,7 +136,7 @@ public class DoubanBookPageProcessor implements PageProcessor {
         return site;
     }
 
-    private void parseBookInf(Page page, String key, String value) {
+    private void parseBookInfo(Page page, String key, String value) {
         if(key.indexOf("作者") >= 0) {
             page.putField("author", value);
         }

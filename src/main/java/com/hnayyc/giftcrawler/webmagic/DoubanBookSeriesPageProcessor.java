@@ -5,9 +5,9 @@ import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
 
 /**
- * 豆瓣丛书
+ * 爬去豆瓣图书丛书中的图书信息
  */
-public class DoubanSeriesPageProcessor implements PageProcessor {
+public class DoubanBookSeriesPageProcessor implements PageProcessor {
 
     private Site site = Site.me().setRetryTimes(3).setSleepTime(100);
 

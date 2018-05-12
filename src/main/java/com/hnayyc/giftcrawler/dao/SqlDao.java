@@ -1,5 +1,6 @@
 package com.hnayyc.giftcrawler.dao;
 
+import com.hnayyc.giftcrawler.model.DoubanBook;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -7,6 +8,8 @@ import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
+
+import java.util.List;
 
 @Repository
 public class SqlDao {
@@ -35,6 +38,27 @@ public class SqlDao {
         return sessionFactory.getCurrentSession();
     }
 
+    /**
+     * 执行SQL进行批量修改/删除操作.
+     *
+     * @param values 数量可变的参数,按顺序绑定.
+     * @return 更新记录数.
+     */
+    public int executeSql(final String sql, final Object... values) {
+        return createSQLQuery(sql, values).executeUpdate();
+    }
+
+    public SQLQuery createSQLQuery(final String sqlQueryString, final Object... values) {
+        Assert.hasText(sqlQueryString, "queryString不能为空");
+        SQLQuery query = getSession().createSQLQuery(sqlQueryString);
+        if (values != null) {
+            for (int i = 0; i < values.length; i++) {
+                query.setParameter(i, values[i]);
+            }
+        }
+        return query;
+    }
+
     public SQLQuery createSQLQueryForMap(final String sqlQueryString, final Object... values) {
         Assert.hasText(sqlQueryString, "queryString不能为空");
         SQLQuery query = getSession().createSQLQuery(sqlQueryString);
@@ -45,5 +69,10 @@ public class SqlDao {
             }
         }
         return query;
+    }
+
+    public void saveDoubanBook(DoubanBook doubanBook) {
+        Assert.notNull(doubanBook, "entity不能为空");
+        getSession().saveOrUpdate(doubanBook);
     }
 }

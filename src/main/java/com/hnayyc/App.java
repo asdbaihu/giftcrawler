@@ -4,15 +4,23 @@ import com.hnayyc.giftcrawler.pipeline.DbPipeline;
 import com.hnayyc.giftcrawler.pipeline.SysoutPipeline;
 import com.hnayyc.giftcrawler.webmagic.DoubanBookPageProcessor;
 import com.hnayyc.giftcrawler.webmagic.GithubRepoPageProcessor;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.downloader.HttpClientGenerator;
 
 import javax.net.ssl.SSLContext;
 import javax.xml.transform.Result;
+import java.io.*;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Properties;
 
 /**
  * Hello world!
@@ -34,6 +42,25 @@ public class App {
             e.printStackTrace();
         }
     }
+
+    /**
+     * 重命名文件
+     * TODO 添加递归遍历指定目录下的所有文件，可以通过文件后缀名过滤。
+     */
+    public static void remoteFileName() {
+        String filePath = "D:\\yc0509.txt";
+        try {
+            File file = new File(filePath);
+            if (file.exists()) {
+                System.out.println(file.getAbsolutePath());
+                System.out.println(file.getName());
+                file.renameTo(new File("D:\\yc2018-05-09.txt"));
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
     public static void main( String[] args ) {
         /**
          *  TODO
@@ -51,12 +78,13 @@ public class App {
         // 阿拉伯的劳伦斯
 //        Spider.create(new DoubanBookPageProcessor()).addUrl("https://book.douban.com/subject/25883305").thread(5).run();
 
-        Spider.create(new DoubanBookPageProcessor()).addPipeline(new DbPipeline()).addUrl("https://book.douban.com/subject/25883305").thread(5).run();
+        // TODO 在Cookie中添加应对豆瓣反爬虫机制的参数
+        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        DbPipeline dbPipeline = (DbPipeline) context.getBean("dbPipeline");
+        dbPipeline.printServiceBean();
 
-//        ResultItems resultItems = new ResultItems();
-//        resultItems.put("code", "41001");
-//        resultItems.put("name", "郑州");
-//        DbPipeline dbPipeline = new DbPipeline();
-//        dbPipeline.process(resultItems, null);
+        Spider.create(new DoubanBookPageProcessor()).addPipeline(dbPipeline).addUrl("https://book.douban.com/subject/26838557").thread(5).run();
+
+//        remoteFileName();
     }
 }
