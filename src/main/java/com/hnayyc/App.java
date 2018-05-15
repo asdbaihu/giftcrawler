@@ -1,26 +1,16 @@
 package com.hnayyc;
 
 import com.hnayyc.giftcrawler.pipeline.DbPipeline;
-import com.hnayyc.giftcrawler.pipeline.SysoutPipeline;
-import com.hnayyc.giftcrawler.webmagic.DoubanBookPageProcessor;
-import com.hnayyc.giftcrawler.webmagic.GithubRepoPageProcessor;
+import com.hnayyc.giftcrawler.processor.DoubanBookPageProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import us.codecraft.webmagic.ResultItems;
 import us.codecraft.webmagic.Spider;
-import us.codecraft.webmagic.downloader.HttpClientGenerator;
 
 import javax.net.ssl.SSLContext;
-import javax.xml.transform.Result;
 import java.io.*;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Properties;
 
 /**
  * Hello world!

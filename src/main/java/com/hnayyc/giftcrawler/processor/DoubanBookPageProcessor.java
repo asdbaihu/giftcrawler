@@ -1,4 +1,4 @@
-package com.hnayyc.giftcrawler.webmagic;
+package com.hnayyc.giftcrawler.processor;
 
 import org.jsoup.nodes.Element;
 import us.codecraft.webmagic.Page;

@@ -1,4 +1,4 @@
-package com.hnayyc.giftcrawler.webmagic;
+package com.hnayyc.giftcrawler.processor;
 
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
